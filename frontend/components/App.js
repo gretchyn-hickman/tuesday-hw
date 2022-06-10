@@ -43,6 +43,26 @@ export default class App extends React.Component {
         this.setState({ ...this.state, error: err.response.data.message });
       });
   };
+  completed = (id) => (evt) => {
+    axios
+      .patch(`${URL}/${id}`)
+      .then((res) => {
+        this.setState({
+          ...this.state,
+          todos: this.state.todos.map((td) => {
+            if (td.id !== id) {
+              return td;
+            }
+            return res.data.data;
+          }),
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        this.setState({ ...this.state, error: err.response.data.message });
+      });
+  };
+
   componentDidMount() {
     this.fetchTodo();
   }
@@ -54,7 +74,11 @@ export default class App extends React.Component {
         <p>{this.state.error}</p>
         <ul>
           {this.state.todos.map((todo) => {
-            return <li key={todo.id}>{todo.name}</li>;
+            return (
+              <li onClick={this.completed(todo.id)} key={todo.id}>
+                {todo.name} {todo.completed ? " - Done" : ""}
+              </li>
+            );
           })}
         </ul>
         <form id="todoForm" onSubmit={this.formSubmit}>
@@ -65,7 +89,7 @@ export default class App extends React.Component {
           />
           <button>Add Item</button>
         </form>
-        <button>Clear</button>
+        <button>Clear Finished Items</button>
       </div>
     );
   }
