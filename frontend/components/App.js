@@ -7,6 +7,7 @@ export default class App extends React.Component {
     todos: [],
     error: "",
     userInput: "",
+    display: true,
   };
   onInput = (evt) => {
     const { value } = evt.target;
@@ -62,6 +63,10 @@ export default class App extends React.Component {
         this.setState({ ...this.state, error: err.response.data.message });
       });
   };
+  changeDisplay = () => {
+    this.setState({ ...this.state, display: !this.state.display });
+    console.log(this.state.display);
+  };
 
   componentDidMount() {
     this.fetchTodo();
@@ -73,13 +78,16 @@ export default class App extends React.Component {
         <h1>My To-Do's</h1>
         <p>{this.state.error}</p>
         <ul>
-          {this.state.todos.map((todo) => {
-            return (
-              <li onClick={this.completed(todo.id)} key={todo.id}>
-                {todo.name} {todo.completed ? " - Done" : ""}
-              </li>
-            );
-          })}
+          {this.state.todos.reduce((acc, td) => {
+            if (this.state.display || !td.completed)
+              return acc.concat(
+                <li onClick={this.completed(td.id)} key={td.id}>
+                  {" "}
+                  {td.name} {td.completed ? " - Done" : ""}{" "}
+                </li>
+              );
+            return acc;
+          }, [])}
         </ul>
         <form id="todoForm" onSubmit={this.formSubmit}>
           <input
@@ -89,8 +97,20 @@ export default class App extends React.Component {
           />
           <button>Add Item</button>
         </form>
-        <button>Clear Finished Items</button>
+        <button onClick={this.changeDisplay}>
+          {this.state.display ? "hide" : "Show"} Finished Items
+        </button>
       </div>
     );
   }
 }
+
+// {
+//   this.state.todos.map((todo) => {
+//     return (
+//       <li onClick={this.completed(todo.id)} key={todo.id}>
+//         {todo.name} {todo.completed ? " - Done" : ""}
+//       </li>
+//     );
+//   });
+// }
